@@ -1,4 +1,4 @@
-﻿@model IEnumerable<LeaveTypeVM>
+﻿@model IEnumerable<LeaveManagement.Common.Models.LeaveTypeVM>
 
 @{
     ViewData["Title"] = "Index";
@@ -33,18 +33,24 @@
             </td>
             
             <td>
-                <a  class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i>Edit</a> |
-                <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i>Details</a> |
-                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id"> <i class="fas fa-trash-alt"></i>Delete</a>
+                <button data-id="@item.Id" class="btn btn-primary allocateBtn" type="button">Allocate Leave</button>
+                <a  class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> |
+                <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a> |
+                 <button data-id="@item.Id" class="btn btn-danger deleteBtn" type="button"><i class="far fa-trash-alt"></i></button>
             </td>
         </tr>
 }
     </tbody>
 </table>
 
-<form id="deleteFrom" asp-action="Delete">
+<form id="deleteForm" asp-action="Delete">
     <input type="hidden" id="leaveTypeId" name="Id" />
 </form>
+
+<form id="allocationForm" asp-action="AllocateLeave">
+    <input type="hidden" id="leaveTypeIdAllocate" name="Id" />
+</form>
+
 
 
 
@@ -64,7 +70,25 @@
                     var btn = $(this);
                     var id = btn.data("id")
                     $('#leaveTypeId').val(id)
-                    $('#deleteFrom').submit();
+                    $('#deleteForm').submit();
+                }
+            });
+            
+        });
+
+        $('.allocateBtn').click(function(e){
+                swal({
+                title: "Are you sure?",
+                text: "Are you sure you want to allocate this leave to all employees?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((confirm)=>{
+                if(confirm){
+                    var btn = $(this);
+                    var id = btn.data("id")
+                    $('#leaveTypeIdAllocate').val(id)
+                    $('#allocationForm').submit();
                 }
             });
             

@@ -1,12 +1,13 @@
-using LeaveManagementWeb.Data;
+using LeaveManagement.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using LeaveManagementWeb.Configurations;
-using LeaveManagementWeb.Contracts;
-using LeaveManagementWeb.Repositories;
+using LeaveManagement.ApplicationLogic.Configurations;
+using LeaveManagement.ApplicationLogic.Contracts;
+using LeaveManagement.ApplicationLogic.Repositories;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using LeaveManagementWeb.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +21,22 @@ builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireC
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddTransient<IEmailSender>(options => new EmailSender("localhost", 25, "no-reply@leavemanagement.com"));
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<ILeaveTypeRepository, LeaveTypeRepository>();
+builder.Services.AddScoped<global::LeaveManagement.ApplicationLogic.Contracts.ILeaveTypeRepository, global::LeaveManagement.ApplicationLogic.Repositories.LeaveTypeRepository>();
+builder.Services.AddScoped<ILeaveAllocationRepository, LeaveAllocationRepository>();
+builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+
 builder.Services.AddAutoMapper(typeof(MapperConfig));
+
+
+//logging application
+builder.Host.UseSerilog((ctx, lc) =>
+                lc.WriteTo.Console()
+                 .ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.AddControllersWithViews();
 
